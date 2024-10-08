@@ -448,7 +448,10 @@ function diffProperties(
   return updatePayload;
 }
 
-function fastAddProperties(
+/**
+ * addProperties adds all the valid props to the payload after being processed.
+ */
+function addProperties(
   payload: null | Object,
   props: Object,
   validAttributes: AttributeConfiguration,
@@ -456,7 +459,7 @@ function fastAddProperties(
   // Flatten nested style props.
   if (isArray(props)) {
     for (let i = 0; i < props.length; i++) {
-      payload = fastAddProperties(payload, props[i], validAttributes);
+      payload = addProperties(payload, props[i], validAttributes);
     }
     return payload;
   }
@@ -503,21 +506,10 @@ function fastAddProperties(
       continue;
     }
 
-    payload = fastAddProperties(payload, prop, attributeConfig);
+    payload = addProperties(payload, prop, attributeConfig);
   }
 
   return payload;
-}
-
-/**
- * addProperties adds all the valid props to the payload after being processed.
- */
-function addProperties(
-  updatePayload: null | Object,
-  props: Object,
-  validAttributes: AttributeConfiguration,
-): null | Object {
-  return diffProperties(updatePayload, emptyObject, props, validAttributes);
 }
 
 /**
@@ -538,7 +530,7 @@ export function create(
   validAttributes: AttributeConfiguration,
 ): null | Object {
   if (enableAddPropertiesFastPath) {
-    return fastAddProperties(null, props, validAttributes);
+    return addProperties(null, props, validAttributes);
   } else {
     return addProperties(null, props, validAttributes);
   }
